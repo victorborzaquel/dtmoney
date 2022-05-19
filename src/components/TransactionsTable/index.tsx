@@ -1,12 +1,25 @@
-import { useEffect } from "react";
-import { api } from "../../services/api";
+import { ITransaction, useTransactions } from "../../hooks/useTransactions";
+import { formatCurrency } from "../../utils/formatCurrency";
+import { formatDate } from "../../utils/formatDate";
 import { Container } from "./styles";
 
 export function TransactionsTable() {
-  useEffect(() => {
-    api.get('transactions')
-      .then(response => console.log(response.data))
-  }, [])
+  const { transactions } = useTransactions()
+
+  function TransactionItem({ title, type, amount, category, createdAt }: ITransaction) {
+    const createdAtFormatted = formatDate(createdAt)
+    const amountFormatted = formatCurrency(amount)
+
+    return (
+      <tr>
+        <td>{title}</td>
+        <td className={type}>{amountFormatted}</td>
+        <td>{category}</td>
+        <td>{createdAtFormatted}</td>
+      </tr>
+    )
+  }
+
 
   return (
     <Container>
@@ -21,19 +34,7 @@ export function TransactionsTable() {
         </thead>
 
         <tbody>
-          <tr>
-            <td>Developer Site</td>
-            <td className="deposit">R$ 12.000,00</td>
-            <td>Developer</td>
-            <td>20/02/2022</td>
-          </tr>
-
-          <tr>
-            <td>Developer Site</td>
-            <td className="withdraw">- R$ 1.000,00</td>
-            <td>Developer</td>
-            <td>20/02/2022</td>
-          </tr>
+          {transactions.map(transaction => <TransactionItem key={transaction.id} {...transaction} />)}
         </tbody>
       </table>
     </Container>
